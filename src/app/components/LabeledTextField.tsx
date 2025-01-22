@@ -6,7 +6,7 @@ export interface LabeledTextFieldProps
   extends Omit<InputHTMLAttributes<HTMLInputElement | HTMLTextAreaElement>, "name"> {
   name: string
   label: string
-  type?: "text" | "password" | "email" | "number" | "textarea" | "datetime-local"
+  type?: "text" | "password" | "email" | "number" | "textarea" | "datetime-local" | "date"
   outerProps?: any
 }
 

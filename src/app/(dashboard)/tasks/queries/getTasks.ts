@@ -7,9 +7,12 @@ interface GetTasksInput {
   status?: TaskStatus | null
   priority?: Priority | null
   clientId?: string | null
-  page: number
-  perPage: number
+  page?: number
+  perPage?: number
+  where?: Prisma.TaskWhereInput
+  orderBy?: Prisma.TaskOrderByWithRelationInput
 }
+
 
 export default resolver.pipe(
   resolver.authorize(),

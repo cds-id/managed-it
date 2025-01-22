@@ -1,35 +1,65 @@
-import { paginate } from "blitz";
-import { resolver } from "@blitzjs/rpc";
-import db, { Prisma } from "db";
+import { paginate } from "blitz"
+import { resolver } from "@blitzjs/rpc"
+import db, { Prisma } from "db"
 
-interface GetSprintsInput
-  extends Pick<
-    Prisma.SprintFindManyArgs,
-    "where" | "orderBy" | "skip" | "take"
-  > {}
+interface GetSprintsInput {
+  search?: string
+  clientId?: string
+  page: number
+  perPage: number
+}
 
 export default resolver.pipe(
   resolver.authorize(),
-  async ({ where, orderBy, skip = 0, take = 100 }: GetSprintsInput) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
+  async ({ search, clientId, page = 0, perPage = 10 }: GetSprintsInput) => {
+    const where: Prisma.SprintWhereInput = {
+      AND: [
+        // Search by name
+        search ? { name: { contains: search } } : {},
+        // Filter by client
+        clientId ? { clientId } : {},
+      ].filter(Boolean),
+    }
+
     const {
       items: sprints,
       hasMore,
       nextPage,
       count,
     } = await paginate({
-      skip,
-      take,
+      skip: page * perPage,
+      take: perPage,
       count: () => db.sprint.count({ where }),
       query: (paginateArgs) =>
-        db.sprint.findMany({ ...paginateArgs, where, orderBy }),
-    });
+        db.sprint.findMany({
+          ...paginateArgs,
+          where,
+          orderBy: { startDate: "desc" },
+          include: {
+            client: {
+              select: {
+                name: true,
+              },
+            },
+            sprintTasks: {
+              include: {
+                task: {
+                  select: {
+                    status: true,
+                  },
+                },
+              },
+            },
+          },
+        }),
+    })
 
     return {
       sprints,
       nextPage,
       hasMore,
       count,
-    };
+      totalPages: Math.ceil(count / perPage),
+    }
   }
-);
+)

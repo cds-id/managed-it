@@ -1,14 +1,32 @@
-import { resolver } from "@blitzjs/rpc";
-import db from "db";
-import { CreateSprintSchema } from "../schemas";
+import { resolver } from "@blitzjs/rpc"
+import db from "db"
+import { CreateSprintSchema } from "../schemas"
 
 export default resolver.pipe(
   resolver.zod(CreateSprintSchema),
   resolver.authorize(),
-  async (input) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const sprint = await db.sprint.create({ data: input });
+  async ({ taskIds, ...data }) => {
+    const sprint = await db.sprint.create({
+      data: {
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : null,
+        sprintTasks: {
+          create: taskIds.map((taskId) => ({
+            task: { connect: { id: taskId } },
+          })),
+        },
+      },
+      include: {
+        client: true,
+        sprintTasks: {
+          include: {
+            task: true,
+          },
+        },
+      },
+    })
 
-    return sprint;
+    return sprint
   }
-);
+)
