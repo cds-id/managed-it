@@ -115,8 +115,13 @@ export const EditClientForm = ({ client }:EditClientFormProps) => {
                     </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Are you sure you want to delete this client? This action cannot be undone.
+                        Are you sure you want to delete this client? This action cannot be undone and will also delete:
                       </p>
+                      <ul className="list-disc list-inside mt-2 text-sm text-gray-500">
+                        <li>All tasks associated with this client</li>
+                        <li>All sprints associated with this client</li>
+                        <li>All sprint-task relationships</li>
+                      </ul>
                     </div>
                   </div>
                 </div>

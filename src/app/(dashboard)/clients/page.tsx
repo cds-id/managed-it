@@ -1,6 +1,10 @@
 import Link from "next/link"
 import { ClientList } from "./components/ClientList"
+import { Metadata } from 'next'
 
+export const metadata: Metadata = {
+  title: "Clients",
+}
 export default function ClientsPage() {
   return (
     <div>

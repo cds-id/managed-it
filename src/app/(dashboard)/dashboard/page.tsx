@@ -1,6 +1,10 @@
 import { invoke } from "src/app/blitz-server"
 import getCurrentUser from "src/app/users/queries/getCurrentUser"
+import { Metadata } from 'next'
 
+export const metadata: Metadata = {
+  title: "Dashboard",
+}
 export default async function DashboardPage() {
   const user = await invoke(getCurrentUser, null)
 

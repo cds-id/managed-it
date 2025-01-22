@@ -1,5 +1,9 @@
 import { ClientForm } from "../components/ClientForm"
+import { Metadata } from 'next'
 
+export const metadata: Metadata = {
+  title: "New Client",
+}
 export default function NewClientPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6">
