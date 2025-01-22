@@ -1,12 +1,14 @@
 "use client"
-import { useQuery } from "@blitzjs/rpc"
+import { useMutation, useQuery } from "@blitzjs/rpc"
 import getTasks from "../queries/getTasks"
 import Link from "next/link"
 import { formatDate } from "src/app/utils/formatDate"
 import { useState, useEffect, useMemo } from "react"
 import { useDebounce } from "src/app/hooks/useDebounce"
 import getClients from "../../clients/queries/getClients"
+import updateTaskStatus from "../mutations/updateTaskStatus"
 import type { Route } from "next"
+import { useRouter } from "next/navigation"
 
 import { Priority, TaskStatus } from "@prisma/client"
 
@@ -43,11 +45,16 @@ const STATUS_CONFIG = {
 }
 
 export function TaskList() {
+  const router = useRouter()
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<TaskStatus | null>(null)
-   const [priority, setPriority] = useState<Priority | null>(null)
+  const [priority, setPriority] = useState<Priority | null>(null)
   const [clientId, setClientId] = useState("")
   const [page, setPage] = useState(0)
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null)
+  const [updateTaskStatusMutation] = useMutation(updateTaskStatus)
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
 
   const debouncedSearch = useDebounce(search, 500)
   const [{ clients }] = useQuery(getClients, {})
@@ -98,6 +105,11 @@ export function TaskList() {
 
   return (
     <div className="space-y-4">
+      {showSuccessAlert && (
+        <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50">
+          <span className="block sm:inline">{successMessage}</span>
+        </div>
+      )}
       <div className="bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
@@ -239,9 +251,36 @@ export function TaskList() {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_CONFIG[task.status].className}`}>
-                      {STATUS_CONFIG[task.status].label}
-                    </span>
+                    <select
+                      value={task.status}
+                      disabled={updatingTaskId === task.id}
+                      onChange={async (e) => {
+                        try {
+                          setUpdatingTaskId(task.id)
+                          await updateTaskStatusMutation({
+                            id: task.id,
+                            status: e.target.value as TaskStatus,
+                          })
+                          setSuccessMessage(`Task status updated to ${STATUS_CONFIG[e.target.value as TaskStatus].label}`)
+                          setShowSuccessAlert(true)
+                          setTimeout(() => setShowSuccessAlert(false), 3000)
+                          router.refresh()
+                        } catch (error) {
+                          console.error("Failed to update task status:", error)
+                        } finally {
+                          setUpdatingTaskId(null)
+                        }
+                      }}
+                      className={`rounded-full text-xs font-medium px-2.5 py-0.5 border-0
+                        ${STATUS_CONFIG[task.status as TaskStatus].className}
+                        transition-colors duration-200 ease-in-out
+                        cursor-pointer focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                        ${updatingTaskId === task.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      <option value="TODO" className="bg-white text-gray-900">To Do</option>
+                      <option value="IN_PROGRESS" className="bg-white text-gray-900">In Progress</option>
+                      <option value="DONE" className="bg-white text-gray-900">Done</option>
+                    </select>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {task.deadline ? formatDate(task.deadline) : '-'}
