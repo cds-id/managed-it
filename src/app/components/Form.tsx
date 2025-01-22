@@ -1,10 +1,11 @@
 import { useState, ReactNode, PropsWithoutRef } from "react"
 import { Formik, FormikProps } from "formik"
 import { validateZodSchema } from "blitz"
+import { FormHTMLAttributes } from "react" // Add this import
 import { z } from "zod"
 
 export interface FormProps<S extends z.ZodType<any, any>>
-  extends Omit<PropsWithoutRef<React.JSX.IntrinsicElements["form"]>, "onSubmit"> {
+  extends Omit<FormHTMLAttributes<HTMLFormElement>, "onSubmit"> {
   /** All your form fields */
   children?: ReactNode
   /** Text to display in the submit button */
@@ -27,6 +28,7 @@ export function Form<S extends z.ZodType<any, any>>({
   schema,
   initialValues,
   onSubmit,
+  className,
   ...props
 }: FormProps<S>) {
   const [formError, setFormError] = useState<string | null>(null)
@@ -47,27 +49,28 @@ export function Form<S extends z.ZodType<any, any>>({
       }}
     >
       {({ handleSubmit, isSubmitting }) => (
-        <form onSubmit={handleSubmit} className="form" {...props}>
-          {/* Form fields supplied as children are rendered here */}
-          {children}
+        <form onSubmit={handleSubmit} className={className} {...props}>
+          <div className="space-y-4">
+            {children}
 
-          {formError && (
-            <div role="alert" style={{ color: "red" }}>
-              {formError}
-            </div>
-          )}
+            {formError && (
+              <div role="alert" className="text-red-600 text-sm mt-2">
+                {formError}
+              </div>
+            )}
 
-          {submitText && (
-            <button type="submit" disabled={isSubmitting}>
-              {submitText}
-            </button>
-          )}
-
-          <style global jsx>{`
-            .form > * + * {
-              margin-top: 1rem;
-            }
-          `}</style>
+            {submitText && (
+              <div className="mt-6">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  {submitText}
+                </button>
+              </div>
+            )}
+          </div>
         </form>
       )}
     </Formik>

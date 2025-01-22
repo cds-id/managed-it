@@ -79,7 +79,7 @@ model Client {
   updatedAt   DateTime @updatedAt
   name        String
   contactInfo String
-  notes       String?  @db.Text
+  notes       String?  @db.Text  // Keep it as notes to match the UI
 
   tasks   Task[]
   sprints Sprint[]

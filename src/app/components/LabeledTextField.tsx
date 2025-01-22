@@ -1,15 +1,16 @@
 import { forwardRef, PropsWithoutRef } from "react"
 import { useField, useFormikContext, ErrorMessage } from "formik"
+import { InputHTMLAttributes } from "react" // Add this import
 
 export interface LabeledTextFieldProps
-  extends PropsWithoutRef<React.JSX.IntrinsicElements["input"]> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "name"> {
   /** Field name. */
   name: string
   /** Field label. */
   label: string
   /** Field type. Doesn't include radio buttons and checkboxes */
   type?: "text" | "password" | "email" | "number"
-  outerProps?: PropsWithoutRef<React.JSX.IntrinsicElements["div"]>
+  outerProps?: any
 }
 
 export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldProps>(
@@ -19,35 +20,24 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
 
     return (
       <div {...outerProps}>
-        <label>
+        <label className="block text-sm font-medium text-gray-700">
           {label}
-          <input {...input} disabled={isSubmitting} {...props} ref={ref} />
+          <input
+            {...input}
+            disabled={isSubmitting}
+            {...props}
+            ref={ref}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
         </label>
 
         <ErrorMessage name={name}>
           {(msg) => (
-            <div role="alert" style={{ color: "red" }}>
+            <div role="alert" className="text-red-600 text-sm mt-1">
               {msg}
             </div>
           )}
         </ErrorMessage>
-
-        <style jsx>{`
-          label {
-            display: flex;
-            flex-direction: column;
-            align-items: start;
-            font-size: 1rem;
-          }
-          input {
-            font-size: 1rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 3px;
-            border: 1px solid purple;
-            appearance: none;
-            margin-top: 0.5rem;
-          }
-        `}</style>
       </div>
     )
   }

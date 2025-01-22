@@ -20,7 +20,7 @@ export const LoginForm = (props: LoginFormProps) => {
   const next = useSearchParams()?.get("next")
   return (
     <>
-      <h1>Login</h1>
+      <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">Login</h1>
 
       <Form
         submitText="Login"
@@ -46,17 +46,16 @@ export const LoginForm = (props: LoginFormProps) => {
             }
           }
         }}
+        className="space-y-6"
       >
         <LabeledTextField name="email" label="Email" placeholder="Email" />
         <LabeledTextField name="password" label="Password" placeholder="Password" type="password" />
-        <div>
-          <Link href={"/forgot-password"}>Forgot your password?</Link>
+        <div className="text-sm">
+          <Link href={"/forgot-password"} className="text-indigo-600 hover:text-indigo-500">
+            Forgot your password?
+          </Link>
         </div>
       </Form>
-
-      <div style={{ marginTop: "1rem" }}>
-        Or <Link href="/signup">Sign Up</Link>
-      </div>
     </>
   )
 }
