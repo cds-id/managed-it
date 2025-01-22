@@ -1,14 +1,21 @@
-import { resolver } from "@blitzjs/rpc";
-import db from "db";
-import { UpdateTaskSchema } from "../schemas";
+import { resolver } from "@blitzjs/rpc"
+import db from "db"
+import { UpdateTaskSchema } from "../schemas"
 
 export default resolver.pipe(
   resolver.zod(UpdateTaskSchema),
   resolver.authorize(),
-  async ({ id, ...data }) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const task = await db.task.update({ where: { id }, data });
-
-    return task;
+  async ({ id, assigneeIds, ...data }) => {
+    const task = await db.task.update({
+      where: { id },
+      data: {
+        ...data,
+        deadline: data.deadline ? new Date(data.deadline) : null,
+        assignees: {
+          set: assigneeIds?.map(id => ({ id })) || [],
+        },
+      },
+    })
+    return task
   }
-);
+)

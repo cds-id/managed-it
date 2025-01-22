@@ -1,22 +1,36 @@
-import { NotFoundError } from "blitz";
-import { resolver } from "@blitzjs/rpc";
-import db from "db";
-import { z } from "zod";
+import { NotFoundError } from "blitz"
+import { resolver } from "@blitzjs/rpc"
+import db from "db"
+import { z } from "zod"
 
 const GetTask = z.object({
-  // This accepts type of undefined, but is required at runtime
-  id: z.number().optional().refine(Boolean, "Required"),
-});
+  id: z.string()
+})
 
 export default resolver.pipe(
   resolver.zod(GetTask),
   resolver.authorize(),
   async ({ id }) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const task = await db.task.findFirst({ where: { id } });
+    const task = await db.task.findFirst({
+      where: { id },
+      include: {
+        client: {
+          select: {
+            name: true
+          }
+        },
+        assignees: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      }
+    })
 
-    if (!task) throw new NotFoundError();
+    if (!task) throw new NotFoundError()
 
-    return task;
+    return task
   }
-);
+)

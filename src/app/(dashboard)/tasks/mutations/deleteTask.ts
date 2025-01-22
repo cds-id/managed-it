@@ -1,14 +1,23 @@
-import { resolver } from "@blitzjs/rpc";
-import db from "db";
-import { DeleteTaskSchema } from "../schemas";
+import { resolver } from "@blitzjs/rpc"
+import db from "db"
+import { DeleteTaskSchema } from "../schemas"
 
 export default resolver.pipe(
   resolver.zod(DeleteTaskSchema),
   resolver.authorize(),
   async ({ id }) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const task = await db.task.deleteMany({ where: { id } });
+    return await db.$transaction(async (tx) => {
+      // Delete sprint tasks first
+      await tx.sprintTask.deleteMany({
+        where: { taskId: id }
+      })
 
-    return task;
+      // Then delete the task
+      const task = await tx.task.delete({
+        where: { id }
+      })
+
+      return task
+    })
   }
-);
+)
