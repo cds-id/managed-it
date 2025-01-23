@@ -5,6 +5,7 @@ import { notFound } from "next/navigation"
 import { Metadata } from 'next'
 import Link from "next/link"
 import { Comments } from "../components/Comments"
+import { TaskForEdit } from "../types"
 
 export const metadata: Metadata = {
   title: "Edit Task",
@@ -31,7 +32,7 @@ export default async function EditTaskPage({ params }: { params: { taskId: strin
             <h1 className="text-2xl font-semibold text-gray-900 mb-8">
               Edit Task: {task.title}
             </h1>
-            <EditTaskForm task={task} />
+            <EditTaskForm task={task as TaskForEdit} />
           </div>
         </div>
         <div className="mt-8">

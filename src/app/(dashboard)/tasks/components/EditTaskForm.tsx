@@ -15,9 +15,10 @@ import { useState } from "react"
 import { User } from "src/app/users/queries/getUsers"
 import { RichTextEditor } from "@/src/app/components/RichTextEditor"
 import { useFormikContext } from "formik"
+import { TaskForEdit, TaskAssignee } from "../types"
 
 interface EditTaskFormProps {
-  task: Task & { client: { name: string }; assignees: User[] }
+  task: TaskForEdit
 }
 
 // Create a separate component for the rich text editor that will be used inside the Form

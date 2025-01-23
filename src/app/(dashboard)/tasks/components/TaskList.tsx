@@ -9,6 +9,8 @@ import getClients from "../../clients/queries/getClients"
 import updateTaskStatus from "../mutations/updateTaskStatus"
 import type { Route } from "next"
 import { useRouter } from "next/navigation"
+import { useCurrentUser } from "src/app/users/hooks/useCurrentUser"
+
 
 import { Priority, TaskStatus } from "@prisma/client"
 
@@ -45,6 +47,8 @@ const STATUS_CONFIG = {
 }
 
 export function TaskList() {
+  const currentUser = useCurrentUser()
+  const isAdmin = currentUser?.role === "ADMIN"
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<TaskStatus | null>(null)
@@ -198,15 +202,14 @@ export function TaskList() {
           <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
           <p className="mt-1 text-sm text-gray-500">Try adjusting your filters or create a new task.</p>
           <div className="mt-6">
-            <Link
-              href={"/tasks/new" as Route}
-              className="inline-flex items-center px-4 py-2 rounded-md bg-indigo-600 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
-            >
-              <svg className="-ml-1 mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-              Create Task
-            </Link>
+            {isAdmin && (
+              <Link
+                href={"/tasks/new" as Route}
+                className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+              >
+                Create Task
+              </Link>
+            )}
           </div>
         </div>
       ) : (
@@ -283,12 +286,14 @@ export function TaskList() {
                     >
                       View
                     </Link>
-                    <Link
-                      href={`/tasks/${task.id}` as Route}
-                      className="text-indigo-600 hover:text-indigo-900 font-medium text-sm"
-                    >
-                      Edit
-                    </Link>
+                    {isAdmin ? (
+                      <Link
+                        href={`/tasks/${task.id}` as Route}
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Edit
+                      </Link>
+                    ) : null}
                   </div>
                 </div>
               </div>

@@ -5,6 +5,9 @@ const nextConfig = {
   experimental: {
     typedRoutes: true,
   },
+  blitz: {
+    resolverPath: "root",
+  },
 }
 
 module.exports = withBlitz(nextConfig)

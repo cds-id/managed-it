@@ -3,9 +3,12 @@ import { useState } from "react"
 import Link from "next/link"
 import { LogoutButton } from "../(auth)/components/LogoutButton"
 import type { Route } from "next"
+import { useCurrentUser } from "../users/hooks/useCurrentUser"
 
 export function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const currentUser = useCurrentUser()
+  const isAdmin = currentUser?.role === "ADMIN"
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -44,6 +47,14 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
                 >
                   Sprints
                 </Link>
+                {isAdmin && (
+                  <Link
+                    href={"/users" as Route}
+                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  >
+                    Users
+                  </Link>
+                )}
               </div>
             </div>
 
