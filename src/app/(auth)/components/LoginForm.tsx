@@ -3,7 +3,7 @@ import { AuthenticationError, PromiseReturnType } from "blitz"
 import Link from "next/link"
 import { LabeledTextField } from "src/app/components/LabeledTextField"
 import { Form, FORM_ERROR } from "src/app/components/Form"
-import login from "../mutations/login"
+import login from "@/src/app/(auth)/mutations/login"
 import { Login } from "../validations"
 import { useMutation } from "@blitzjs/rpc"
 import { useSearchParams } from "next/navigation"
@@ -59,9 +59,7 @@ export const LoginForm = (props: LoginFormProps) => {
 
         {/* Display error message */}
         {error && (
-          <div className="text-sm text-red-600 font-medium rounded-md bg-red-50 p-3">
-            {error}
-          </div>
+          <div className="text-sm text-red-600 font-medium rounded-md bg-red-50 p-3">{error}</div>
         )}
 
         <div className="text-sm">
