@@ -1,7 +1,7 @@
 import { resolver } from "@blitzjs/rpc"
 import db from "db"
 import { UpdateUserSchema } from "../schemas"
-import { SecurePassword } from "@blitzjs/auth/secure-password"
+import { Password } from "src/lib/password"
 
 export default resolver.pipe(
   resolver.zod(UpdateUserSchema),
@@ -10,7 +10,7 @@ export default resolver.pipe(
     const updateData: any = { ...data }
 
     if (password) {
-      updateData.hashedPassword = await SecurePassword.hash(password)
+      updateData.hashedPassword = await Password.hash(password)
     }
 
     const user = await db.user.update({
