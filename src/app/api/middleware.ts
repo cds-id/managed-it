@@ -1,22 +1,19 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from "next/server"
+import { getBlitzContext } from "../blitz-server"
 
-export function middleware(request: NextRequest) {
-  // Allow setup routes without authentication
-  if (request.nextUrl.pathname.startsWith('/api/setup')) {
-    return NextResponse.next({
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    })
+export async function middleware(request: Request) {
+  // Check if request is for files
+  if (request.url.includes("/api/reports/") || request.url.includes("/api/uploads/")) {
+    const ctx = await getBlitzContext()
+
+    if (!ctx.session.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
   }
 
-  // Handle other API routes...
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: '/api/:path*',
+  matcher: ["/api/reports/:path*", "/api/uploads/:path*"],
 }

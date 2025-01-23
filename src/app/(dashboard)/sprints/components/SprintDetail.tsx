@@ -7,7 +7,7 @@ import deleteSprint from "../mutations/deleteSprint"
 import { formatDate } from "src/app/utils/formatDate"
 import { useMutation } from "@blitzjs/rpc"
 import generateReport from "../mutations/generateReport"
-import { REPORT_LANGUAGE } from 'src/app/config/language'
+import { REPORT_LANGUAGE } from "src/app/config/language"
 import { Language } from "src/app/config/language"
 
 type SprintWithRelations = Sprint & {
@@ -25,20 +25,23 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
   const [updateSprintMutation] = useMutation(updateSprint)
   const [deleteSprintMutation] = useMutation(deleteSprint)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [reportLanguage, setReportLanguage] = useState<Language>('ID')
+  const [reportLanguage, setReportLanguage] = useState<Language>("ID")
   const [generateReportMutation] = useMutation(generateReport)
   const [isGeneratingReport, setIsGeneratingReport] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
 
-  const completedTasks = sprint.sprintTasks.filter(st => st.task.status === "DONE")
+  const completedTasks = sprint.sprintTasks.filter((st) => st.task.status === "DONE")
   const completionPercentage = Math.round((completedTasks.length / sprint.sprintTasks.length) * 100)
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "DONE": return "bg-green-100 text-green-800"
-      case "IN_PROGRESS": return "bg-blue-100 text-blue-800"
-      default: return "bg-gray-100 text-gray-800"
+      case "DONE":
+        return "bg-green-100 text-green-800"
+      case "IN_PROGRESS":
+        return "bg-blue-100 text-blue-800"
+      default:
+        return "bg-gray-100 text-gray-800"
     }
   }
 
@@ -76,17 +79,17 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
                 const result = await generateReportMutation({
                   sprintId: sprint.id,
                   reportType: "BAST",
-                  language: reportLanguage
+                  language: reportLanguage,
                 })
 
-                const link = document.createElement('a')
+                const link = document.createElement("a")
                 link.href = result.url
-                link.download = result.filename
+                ;(link.download = `/api/reports/${result.filename}`), "_blank"
                 document.body.appendChild(link)
                 link.click()
                 document.body.removeChild(link)
               } catch (error) {
-                console.error('Failed to generate report:', error)
+                console.error("Failed to generate report:", error)
               } finally {
                 setIsGeneratingReport(false)
               }
@@ -97,15 +100,36 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
             {isGeneratingReport ? (
               <>
                 <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
                 Generating Report...
               </>
             ) : (
               <>
-                <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="-ml-1 mr-2 h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
                 Download BAST
               </>
@@ -137,7 +161,7 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
           <div className="sm:col-span-1">
             <dt className="text-sm font-medium text-gray-500">End Date</dt>
             <dd className="mt-1 text-sm text-gray-900">
-              {sprint.endDate ? formatDate(sprint.endDate) : 'Ongoing'}
+              {sprint.endDate ? formatDate(sprint.endDate) : "Ongoing"}
             </dd>
           </div>
         </dl>
@@ -154,13 +178,15 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
                   <h5 className="text-sm font-medium text-gray-900">{task.title}</h5>
                   <p className="text-sm text-gray-500">{task.description}</p>
                   <div className="flex justify-between items-center">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                        task.status
+                      )}`}
+                    >
                       {task.status}
                     </span>
                     {task.deadline && (
-                      <span className="text-xs text-gray-500">
-                        {formatDate(task.deadline)}
-                      </span>
+                      <span className="text-xs text-gray-500">{formatDate(task.deadline)}</span>
                     )}
                   </div>
                 </div>
@@ -176,16 +202,17 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
           <h4 className="text-lg font-medium text-gray-900">Tasks</h4>
           <div className="mt-4 space-y-4">
             {sprint.sprintTasks.map(({ task }) => (
-              <div
-                key={task.id}
-                className="border rounded-lg p-4 hover:bg-gray-50"
-              >
+              <div key={task.id} className="border rounded-lg p-4 hover:bg-gray-50">
                 <div className="flex items-center justify-between">
                   <div>
                     <h5 className="text-sm font-medium text-gray-900">{task.title}</h5>
                     <p className="mt-1 text-sm text-gray-500">{task.description}</p>
                   </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
+                      task.status
+                    )}`}
+                  >
                     {task.status}
                   </span>
                 </div>
