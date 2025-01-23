@@ -9,6 +9,7 @@ import { useMutation } from "@blitzjs/rpc"
 import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 import type { Route } from "next"
+import { useState } from "react" // Add this import
 
 type LoginFormProps = {
   onSuccess?: (user: PromiseReturnType<typeof login>) => void
@@ -18,6 +19,8 @@ export const LoginForm = (props: LoginFormProps) => {
   const [loginMutation] = useMutation(login)
   const router = useRouter()
   const next = useSearchParams()?.get("next")
+  const [error, setError] = useState<string | null>(null) // Add error state
+
   return (
     <>
       <h1 className="text-3xl font-bold text-center text-gray-900 mb-8">Login</h1>
@@ -28,6 +31,7 @@ export const LoginForm = (props: LoginFormProps) => {
         initialValues={{ email: "", password: "" }}
         onSubmit={async (values) => {
           try {
+            setError(null) // Clear any previous errors
             await loginMutation(values)
             router.refresh()
             if (next) {
@@ -37,11 +41,13 @@ export const LoginForm = (props: LoginFormProps) => {
             }
           } catch (error: any) {
             if (error instanceof AuthenticationError) {
-              return { [FORM_ERROR]: "Sorry, those credentials are invalid" }
+              // Set more user-friendly error message
+              setError("Invalid email or password. Please try again.")
+              return { email: " ", password: " " } // Clear form fields
             } else {
+              setError("An unexpected error occurred. Please try again.")
               return {
-                [FORM_ERROR]:
-                  "Sorry, we had an unexpected error. Please try again. - " + error.toString(),
+                [FORM_ERROR]: error.toString(),
               }
             }
           }
@@ -50,6 +56,14 @@ export const LoginForm = (props: LoginFormProps) => {
       >
         <LabeledTextField name="email" label="Email" placeholder="Email" />
         <LabeledTextField name="password" label="Password" placeholder="Password" type="password" />
+
+        {/* Display error message */}
+        {error && (
+          <div className="text-sm text-red-600 font-medium rounded-md bg-red-50 p-3">
+            {error}
+          </div>
+        )}
+
         <div className="text-sm">
           <Link href={"/forgot-password"} className="text-indigo-600 hover:text-indigo-500">
             Forgot your password?
