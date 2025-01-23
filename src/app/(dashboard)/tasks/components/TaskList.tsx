@@ -102,7 +102,6 @@ export function TaskList() {
 
     return rangeWithDots
   }, [page, totalPages])
-
   return (
     <div className="space-y-4">
       {showSuccessAlert && (
@@ -110,8 +109,10 @@ export function TaskList() {
           <span className="block sm:inline">{successMessage}</span>
         </div>
       )}
+
+      {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Search</label>
             <input
@@ -209,162 +210,233 @@ export function TaskList() {
           </div>
         </div>
       ) : (
-        <div className="overflow-hidden bg-white shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead>
-              <tr className="bg-gray-50">
-                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
-                  Title
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Client
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Priority
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Status
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Deadline
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Assigned To
-                </th>
-                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                  <span className="sr-only">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {tasks.map((task) => (
-                <tr key={task.id} className="hover:bg-gray-50">
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+        <>
+          {/* Mobile Task List */}
+          <div className="block sm:hidden space-y-4">
+            {tasks.map((task) => (
+              <div key={task.id} className="bg-white shadow rounded-lg">
+                <div className="p-4">
+                  <Link href={`/tasks/${task.id}/detail` as Route} className="block">
+                    <h3 className="text-lg font-medium text-gray-900">{task.title}</h3>
+                    <div className="mt-2 space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-500">Client:</span>
+                        <span className="text-sm font-medium">{task.client.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-500">Priority:</span>
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PRIORITY_CONFIG[task.priority].className}`}>
+                          {PRIORITY_CONFIG[task.priority].label}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-500">Status:</span>
+                        <select
+                          value={task.status}
+                          disabled={updatingTaskId === task.id}
+                          onChange={async (e) => {
+                            try {
+                              setUpdatingTaskId(task.id)
+                              await updateTaskStatusMutation({
+                                id: task.id,
+                                status: e.target.value as TaskStatus,
+                              })
+                              setSuccessMessage(`Task status updated to ${STATUS_CONFIG[e.target.value as TaskStatus].label}`)
+                              setShowSuccessAlert(true)
+                              setTimeout(() => setShowSuccessAlert(false), 3000)
+                              router.refresh()
+                            } catch (error) {
+                              console.error("Failed to update task status:", error)
+                            } finally {
+                              setUpdatingTaskId(null)
+                            }
+                          }}
+                          className={`rounded-full text-xs font-medium px-2.5 py-0.5 border-0
+                            ${STATUS_CONFIG[task.status as TaskStatus].className}
+                            transition-colors duration-200 ease-in-out
+                            cursor-pointer focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                            ${updatingTaskId === task.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          <option value="TODO" className="bg-white text-gray-900">To Do</option>
+                          <option value="IN_PROGRESS" className="bg-white text-gray-900">In Progress</option>
+                          <option value="DONE" className="bg-white text-gray-900">Done</option>
+                        </select>
+                      </div>
+                      {task.deadline && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-500">Deadline:</span>
+                          <span className="text-sm">{formatDate(task.deadline)}</span>
+                        </div>
+                      )}
+                      {task.assignees.length > 0 && (
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-500">Assigned To:</span>
+                          <span className="text-sm">{task.assignees.map(u => u.name || u.email).join(', ')}</span>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+                  <div className="mt-4 flex justify-end space-x-3 border-t pt-4">
                     <Link
                       href={`/tasks/${task.id}/detail` as Route}
-                      className="hover:text-indigo-600 hover:underline"
+                      className="text-indigo-600 hover:text-indigo-900 font-medium text-sm"
                     >
-                      {task.title}
+                      View
                     </Link>
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {task.client.name}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PRIORITY_CONFIG[task.priority].className}`}>
-                      {PRIORITY_CONFIG[task.priority].label}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm">
-                    <select
-                      value={task.status}
-                      disabled={updatingTaskId === task.id}
-                      onChange={async (e) => {
-                        try {
-                          setUpdatingTaskId(task.id)
-                          await updateTaskStatusMutation({
-                            id: task.id,
-                            status: e.target.value as TaskStatus,
-                          })
-                          setSuccessMessage(`Task status updated to ${STATUS_CONFIG[e.target.value as TaskStatus].label}`)
-                          setShowSuccessAlert(true)
-                          setTimeout(() => setShowSuccessAlert(false), 3000)
-                          router.refresh()
-                        } catch (error) {
-                          console.error("Failed to update task status:", error)
-                        } finally {
-                          setUpdatingTaskId(null)
-                        }
-                      }}
-                      className={`rounded-full text-xs font-medium px-2.5 py-0.5 border-0
-                        ${STATUS_CONFIG[task.status as TaskStatus].className}
-                        transition-colors duration-200 ease-in-out
-                        cursor-pointer focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                        ${updatingTaskId === task.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    <Link
+                      href={`/tasks/${task.id}` as Route}
+                      className="text-indigo-600 hover:text-indigo-900 font-medium text-sm"
                     >
-                      <option value="TODO" className="bg-white text-gray-900">To Do</option>
-                      <option value="IN_PROGRESS" className="bg-white text-gray-900">In Progress</option>
-                      <option value="DONE" className="bg-white text-gray-900">Done</option>
-                    </select>
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {task.deadline ? formatDate(task.deadline) : '-'}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {task.assignees.length > 0
-                      ? task.assignees
-                          .map((user) => user.name || user.email)
-                          .join(", ")
-                      : "-"}
-                  </td>
-                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <div className="flex justify-end space-x-3">
+                      Edit
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Task List */}
+          <div className="hidden sm:block overflow-hidden bg-white shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+            <table className="min-w-full divide-y divide-gray-300">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">Title</th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Client</th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Priority</th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Deadline</th>
+                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Assigned To</th>
+                  <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                    <span className="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {tasks.map((task) => (
+                  <tr key={task.id} className="hover:bg-gray-50">
+                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
                       <Link
                         href={`/tasks/${task.id}/detail` as Route}
-                        className="text-indigo-600 hover:text-indigo-900 font-medium hover:underline"
+                        className="hover:text-indigo-600 hover:underline"
                       >
-                        View
+                        {task.title}
                       </Link>
-                      <Link
-                        href={`/tasks/${task.id}` as Route}
-                        className="text-indigo-600 hover:text-indigo-900 font-medium hover:underline"
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {task.client.name}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PRIORITY_CONFIG[task.priority].className}`}>
+                        {PRIORITY_CONFIG[task.priority].label}
+                      </span>
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm">
+                      <select
+                        value={task.status}
+                        disabled={updatingTaskId === task.id}
+                        onChange={async (e) => {
+                          try {
+                            setUpdatingTaskId(task.id)
+                            await updateTaskStatusMutation({
+                              id: task.id,
+                              status: e.target.value as TaskStatus,
+                            })
+                            setSuccessMessage(`Task status updated to ${STATUS_CONFIG[e.target.value as TaskStatus].label}`)
+                            setShowSuccessAlert(true)
+                            setTimeout(() => setShowSuccessAlert(false), 3000)
+                            router.refresh()
+                          } catch (error) {
+                            console.error("Failed to update task status:", error)
+                          } finally {
+                            setUpdatingTaskId(null)
+                          }
+                        }}
+                        className={`rounded-full text-xs font-medium px-2.5 py-0.5 border-0
+                          ${STATUS_CONFIG[task.status as TaskStatus].className}
+                          transition-colors duration-200 ease-in-out
+                          cursor-pointer focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                          ${updatingTaskId === task.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        Edit
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                        <option value="TODO" className="bg-white text-gray-900">To Do</option>
+                        <option value="IN_PROGRESS" className="bg-white text-gray-900">In Progress</option>
+                        <option value="DONE" className="bg-white text-gray-900">Done</option>
+                      </select>
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {task.deadline ? formatDate(task.deadline) : '-'}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {task.assignees.length > 0
+                        ? task.assignees
+                            .map((user) => user.name || user.email)
+                            .join(", ")
+                        : "-"}
+                    </td>
+                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      <div className="flex justify-end space-x-3">
+                        <Link
+                          href={`/tasks/${task.id}/detail` as Route}
+                          className="text-indigo-600 hover:text-indigo-900 font-medium hover:underline"
+                        >
+                          View
+                        </Link>
+                        <Link
+                          href={`/tasks/${task.id}` as Route}
+                          className="text-indigo-600 hover:text-indigo-900 font-medium hover:underline"
+                        >
+                          Edit
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
-      <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-        <div className="flex-1 flex justify-between sm:hidden">
+      {/* Pagination */}
+      <div className="mt-4">
+        <nav className="flex justify-between items-center">
           <button
             onClick={() => setPage(Math.max(0, page - 1))}
             disabled={page === 0}
-            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
             Previous
           </button>
+
+          {/* Show page numbers on desktop */}
+          <div className="hidden sm:flex">
+            {visiblePages.map((pageNum, i) => (
+              <button
+                key={i}
+                onClick={() => typeof pageNum === 'number' && setPage(pageNum)}
+                className={`relative inline-flex items-center px-4 py-2 text-sm font-medium border ${
+                  page === pageNum
+                    ? 'bg-indigo-50 border-indigo-500 text-indigo-600'
+                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {pageNum}
+              </button>
+            ))}
+          </div>
+
+          {/* Show current page on mobile */}
+          <span className="sm:hidden text-sm text-gray-700">
+            Page {page + 1} of {totalPages}
+          </span>
+
           <button
             onClick={() => setPage(page + 1)}
             disabled={!hasMore}
-            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
             Next
           </button>
-        </div>
-        <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm text-gray-700">
-              Showing <span className="font-medium">{page * ITEMS_PER_PAGE + 1}</span> to{" "}
-              <span className="font-medium">
-                {Math.min((page + 1) * ITEMS_PER_PAGE, count)}
-              </span>{" "}
-              of <span className="font-medium">{count}</span> results
-            </p>
-          </div>
-          <div>
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setPage(i)}
-                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                    page === i
-                      ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
-                      : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
+        </nav>
       </div>
     </div>
   )

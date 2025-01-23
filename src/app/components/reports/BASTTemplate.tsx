@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/id'
 import 'dayjs/locale/en'
 import { SprintTask, Task, TaskStatus } from '@prisma/client'
+import { COMPANY_CONFIG } from '../../config/company'
 
 dayjs.locale(REPORT_LANGUAGE.toLowerCase())
 
@@ -97,7 +98,7 @@ export const BASTTemplate = ({ sprint, currentDate, documentNumber, language }: 
         </View>
 
         <View style={styles.section}>
-          <Text>2. {t.secondParty}: [Your Company Name]</Text>
+          <Text>2. {t.secondParty}: {COMPANY_CONFIG.name}</Text>
           <Text>   {t.asSecondParty}</Text>
         </View>
 
@@ -140,7 +141,7 @@ export const BASTTemplate = ({ sprint, currentDate, documentNumber, language }: 
 
           <View style={styles.signatureBox}>
             <Text>{t.signature.secondParty}</Text>
-            <Text>[Your Company Name]</Text>
+            <Text>{COMPANY_CONFIG.name}</Text>
             <Text style={{ marginTop: 50 }}>(_________________)</Text>
           </View>
         </View>

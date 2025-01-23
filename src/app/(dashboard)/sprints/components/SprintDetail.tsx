@@ -45,19 +45,21 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
   return (
     <div className="bg-white shadow sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6">
-        <div className="flex justify-between items-start">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+          <div className="mb-4 sm:mb-0">
             <h3 className="text-2xl font-bold leading-6 text-gray-900">{sprint.name}</h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500">Client: {sprint.client.name}</p>
           </div>
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="text-red-600 hover:text-red-900"
+            className="text-red-600 hover:text-red-900 self-start"
           >
             Delete Sprint
           </button>
         </div>
-        <div className="mt-4 flex justify-end space-x-4">
+
+        {/* Report Generation Controls */}
+        <div className="mt-4 flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-4">
           <select
             className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             value={reportLanguage}
@@ -69,28 +71,28 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
 
           <button
             onClick={async () => {
-            try {
-              setIsGeneratingReport(true)
-              const result = await generateReportMutation({
-                sprintId: sprint.id,
-                reportType: "BAST",
-                language: reportLanguage
-              })
+              try {
+                setIsGeneratingReport(true)
+                const result = await generateReportMutation({
+                  sprintId: sprint.id,
+                  reportType: "BAST",
+                  language: reportLanguage
+                })
 
-              const link = document.createElement('a')
-              link.href = result.url
-              link.download = result.filename
-              document.body.appendChild(link)
-              link.click()
-              document.body.removeChild(link)
-            } catch (error) {
-              console.error('Failed to generate report:', error)
-            } finally {
-              setIsGeneratingReport(false)
-            }
-          }}
-          disabled={isGeneratingReport}
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                const link = document.createElement('a')
+                link.href = result.url
+                link.download = result.filename
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+              } catch (error) {
+                console.error('Failed to generate report:', error)
+              } finally {
+                setIsGeneratingReport(false)
+              }
+            }}
+            disabled={isGeneratingReport}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
             {isGeneratingReport ? (
               <>
@@ -141,8 +143,35 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
         </dl>
       </div>
 
-      {/* Tasks List */}
-      <div className="border-t border-gray-200">
+      {/* Tasks List - Mobile */}
+      <div className="border-t border-gray-200 sm:hidden">
+        <div className="px-4 py-5">
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Tasks</h4>
+          <div className="space-y-4">
+            {sprint.sprintTasks.map(({ task }) => (
+              <div key={task.id} className="border rounded-lg p-4">
+                <div className="space-y-2">
+                  <h5 className="text-sm font-medium text-gray-900">{task.title}</h5>
+                  <p className="text-sm text-gray-500">{task.description}</p>
+                  <div className="flex justify-between items-center">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                      {task.status}
+                    </span>
+                    {task.deadline && (
+                      <span className="text-xs text-gray-500">
+                        {formatDate(task.deadline)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Tasks List - Desktop */}
+      <div className="border-t border-gray-200 hidden sm:block">
         <div className="px-4 py-5 sm:px-6">
           <h4 className="text-lg font-medium text-gray-900">Tasks</h4>
           <div className="mt-4 space-y-4">
