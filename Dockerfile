@@ -54,17 +54,7 @@ RUN apk add --no-cache \
 WORKDIR /app
 
 # Copy necessary files from builder
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.env ./.env
-COPY --from=builder /app/db ./db
-COPY --from=builder /app/prisma ./prisma
-
-# Copy Prisma generated files specifically
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app ./
 
 # Set environment variables
 ENV NODE_ENV=production
