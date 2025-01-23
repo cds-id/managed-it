@@ -1,6 +1,8 @@
-import "./styles/globals.css"
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { ConfigProvider } from './providers/ConfigProvider'
 import { BlitzProvider } from "./blitz-client"
 import { Inter } from "next/font/google"
+import "./styles/globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -17,7 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <BlitzProvider>
-          <>{children}</>
+          <ErrorBoundary>
+            <ConfigProvider>
+              {children}
+            </ConfigProvider>
+          </ErrorBoundary>
         </BlitzProvider>
       </body>
     </html>
