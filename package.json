@@ -13,7 +13,8 @@
     "prepare": "husky install",
     "db:migrate": "prisma migrate deploy",
     "db:reset": "prisma migrate reset",
-    "db:seed": "prisma db seed"
+    "db:seed": "prisma db seed",
+    "install:wizard": "node install.js"
   },
   "prisma": {
     "schema": "db/schema.prisma",
@@ -29,6 +30,7 @@
     ]
   },
   "dependencies": {
+    "inquirer": "^8.2.0",
     "@blitzjs/auth": "2.2.0",
     "@blitzjs/next": "2.2.0",
     "@blitzjs/rpc": "2.2.0",
