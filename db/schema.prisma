@@ -30,18 +30,20 @@ enum TaskStatus {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id             String    @id @default(uuid())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
   name           String?
-  email          String   @unique
+  email          String    @unique
   hashedPassword String?
-  role           UserRole @default(WORKER)
+  role           UserRole  @default(WORKER)
 
   tokens        Token[]
   sessions      Session[]
-  assignedTasks Task[]    @relation("TaskAssignees")
+  assignedTasks Task[]     @relation("TaskAssignees")
+  comments      Comment[]  @relation("UserComments") // Add relation name
 }
+
 
 model Session {
   id                 String    @id @default(uuid())
@@ -85,21 +87,36 @@ model Client {
   sprints Sprint[]
 }
 
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Task     @relation("TaskComments", fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    String
+  user      User     @relation("UserComments", fields: [userId], references: [id])
+  userId    String
+
+  @@index([taskId])
+  @@index([userId])
+}
+
 model Task {
-  id          String     @id @default(uuid())
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus
+  priority    Priority
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  title       String
-  description String?    @db.Text
-  priority    Priority   @default(MEDIUM)
-  status      TaskStatus @default(TODO)
   deadline    DateTime?
-
-  client   Client @relation(fields: [clientId], references: [id])
-  clientId String
-
-  assignees   User[]       @relation("TaskAssignees")
+  clientId    String
+  client      Client     @relation(fields: [clientId], references: [id])
+  assignees   User[]     @relation("TaskAssignees")
+  comments    Comment[]  @relation("TaskComments") // Add relation name
   sprintTasks SprintTask[]
+
+  @@index([clientId])
 }
 
 model Sprint {

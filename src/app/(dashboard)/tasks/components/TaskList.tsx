@@ -240,7 +240,12 @@ export function TaskList() {
               {tasks.map((task) => (
                 <tr key={task.id} className="hover:bg-gray-50">
                   <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
-                    {task.title}
+                    <Link
+                      href={`/tasks/${task.id}/detail` as Route}
+                      className="hover:text-indigo-600 hover:underline"
+                    >
+                      {task.title}
+                    </Link>
                   </td>
                   <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {task.client.name}
@@ -293,12 +298,20 @@ export function TaskList() {
                       : "-"}
                   </td>
                   <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <Link
-                      href={`/tasks/${task.id}` as Route}
-                      className="text-indigo-600 hover:text-indigo-900 font-medium hover:underline"
-                    >
-                      Edit
-                    </Link>
+                    <div className="flex justify-end space-x-3">
+                      <Link
+                        href={`/tasks/${task.id}/detail` as Route}
+                        className="text-indigo-600 hover:text-indigo-900 font-medium hover:underline"
+                      >
+                        View
+                      </Link>
+                      <Link
+                        href={`/tasks/${task.id}` as Route}
+                        className="text-indigo-600 hover:text-indigo-900 font-medium hover:underline"
+                      >
+                        Edit
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

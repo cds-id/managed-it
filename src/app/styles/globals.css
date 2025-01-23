@@ -23,3 +23,62 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/* Rich Editor Styles */
+.ProseMirror p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.ProseMirror {
+  @apply prose prose-sm sm:prose lg:prose-lg xl:prose-xl max-w-none;
+}
+
+.ProseMirror:focus {
+  @apply outline-none;
+}
+
+.ProseMirror img {
+  @apply max-h-[400px] rounded-md;
+}
+
+/* Additional editor styles */
+.ProseMirror > * + * {
+  @apply mt-4;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  @apply pl-4;
+}
+
+.ProseMirror h1 {
+  @apply text-2xl font-bold mt-6 mb-4;
+}
+
+.ProseMirror h2 {
+  @apply text-xl font-bold mt-5 mb-3;
+}
+
+.ProseMirror h3 {
+  @apply text-lg font-bold mt-4 mb-2;
+}
+
+.ProseMirror blockquote {
+  @apply pl-4 border-l-4 border-gray-200 italic;
+}
+
+.ProseMirror code {
+  @apply bg-gray-100 rounded px-1;
+}
+
+.ProseMirror pre {
+  @apply bg-gray-100 rounded p-4 overflow-x-auto;
+}
+
+.ProseMirror a {
+  @apply text-blue-600 hover:text-blue-800 underline;
+}

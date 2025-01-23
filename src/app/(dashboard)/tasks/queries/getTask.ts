@@ -2,6 +2,7 @@ import { NotFoundError } from "blitz"
 import { resolver } from "@blitzjs/rpc"
 import db from "db"
 import { z } from "zod"
+import { TaskWithRelations } from "../types"
 
 const GetTask = z.object({
   id: z.string()
@@ -10,7 +11,7 @@ const GetTask = z.object({
 export default resolver.pipe(
   resolver.zod(GetTask),
   resolver.authorize(),
-  async ({ id }) => {
+  async ({ id }): Promise<TaskWithRelations> => {
     const task = await db.task.findFirst({
       where: { id },
       include: {
@@ -25,12 +26,17 @@ export default resolver.pipe(
             name: true,
             email: true
           }
+        },
+        _count: {
+          select: {
+            comments: true
+          }
         }
       }
     })
 
     if (!task) throw new NotFoundError()
 
-    return task
+    return task as TaskWithRelations
   }
 )

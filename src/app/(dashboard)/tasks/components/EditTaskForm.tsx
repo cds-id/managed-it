@@ -13,9 +13,28 @@ import getUsers from "../../../users/queries/getUsers"
 import { Task } from "@prisma/client"
 import { useState } from "react"
 import { User } from "src/app/users/queries/getUsers"
+import { RichTextEditor } from "@/src/app/components/RichTextEditor"
+import { useFormikContext } from "formik"
 
 interface EditTaskFormProps {
   task: Task & { client: { name: string }; assignees: User[] }
+}
+
+// Create a separate component for the rich text editor that will be used inside the Form
+const TaskDescriptionField = () => {
+  const { values, setFieldValue } = useFormikContext<any>()
+  return (
+    <div className="col-span-full">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Description
+      </label>
+      <RichTextEditor
+        initialContent={values.description || ''}
+        onChange={(content) => setFieldValue('description', content)}
+        placeholder="Enter task description..."
+      />
+    </div>
+  )
 }
 
 export function EditTaskForm({ task }: EditTaskFormProps) {
@@ -62,14 +81,8 @@ export function EditTaskForm({ task }: EditTaskFormProps) {
               <LabeledTextField name="title" label="Title" placeholder="Task title" />
             </div>
 
-            <div className="col-span-full">
-              <LabeledTextField
-                name="description"
-                label="Description"
-                placeholder="Task description"
-                type="textarea"
-              />
-            </div>
+
+            <TaskDescriptionField />
 
             <div className="col-span-full md:col-span-1">
               <LabeledSelect

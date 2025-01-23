@@ -1,16 +1,17 @@
-import { EditTaskForm } from "../components/EditTaskForm"
 import { invoke } from "src/app/blitz-server"
-import getTask from "../queries/getTask"
+import getTask from "../../queries/getTask"
 import { notFound } from "next/navigation"
 import { Metadata } from 'next'
 import Link from "next/link"
-import { Comments } from "../components/Comments"
+import { Comments } from "../../components/Comments"
+import { TaskDetail } from "../../components/TaskDetail"
+import { TaskWithRelations } from "../../types"
 
 export const metadata: Metadata = {
-  title: "Edit Task",
+  title: "Task Details",
 }
 
-export default async function EditTaskPage({ params }: { params: { taskId: string } }) {
+export default async function TaskDetailPage({ params }: { params: { taskId: string } }) {
   const task = await invoke(getTask, { id: params.taskId }).catch(() => null)
 
   if (!task) return notFound()
@@ -26,14 +27,7 @@ export default async function EditTaskPage({ params }: { params: { taskId: strin
             ← Back to Tasks
           </Link>
         </div>
-        <div className="bg-white shadow-sm rounded-lg">
-          <div className="px-4 py-5 sm:p-6">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-8">
-              Edit Task: {task.title}
-            </h1>
-            <EditTaskForm task={task} />
-          </div>
-        </div>
+        <TaskDetail task={task as TaskWithRelations} />
         <div className="mt-8">
           <Comments taskId={task.id} />
         </div>
