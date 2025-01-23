@@ -1,3 +1,9 @@
+# [1.2.0](https://github.com/cds-id/managed-it/compare/v1.1.0...v1.2.0) (2025-01-23)
+
+### Bug Fixes
+
+- dockerfile ([98e38e9](https://github.com/cds-id/managed-it/commit/98e38e945ac5e89fe0e91edf9d5b850653427e6b))
+
 # 1.1.0 (2025-01-23)
 
 ### Bug Fixes
