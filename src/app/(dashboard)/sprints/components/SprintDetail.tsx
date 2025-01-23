@@ -1,11 +1,14 @@
 "use client"
-import { useMutation } from "@blitzjs/rpc"
 import { Sprint, Task, SprintTask } from "@prisma/client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import updateSprint from "../mutations/updateSprint"
 import deleteSprint from "../mutations/deleteSprint"
 import { formatDate } from "src/app/utils/formatDate"
+import { useMutation } from "@blitzjs/rpc"
+import generateReport from "../mutations/generateReport"
+import { REPORT_LANGUAGE } from 'src/app/config/language'
+import { Language } from "src/app/config/language"
 
 type SprintWithRelations = Sprint & {
   client: { name: string }
@@ -22,6 +25,9 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
   const [updateSprintMutation] = useMutation(updateSprint)
   const [deleteSprintMutation] = useMutation(deleteSprint)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [reportLanguage, setReportLanguage] = useState<Language>('ID')
+  const [generateReportMutation] = useMutation(generateReport)
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
 
@@ -49,6 +55,59 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
             className="text-red-600 hover:text-red-900"
           >
             Delete Sprint
+          </button>
+        </div>
+        <div className="mt-4 flex justify-end space-x-4">
+          <select
+            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            value={reportLanguage}
+            onChange={(e) => setReportLanguage(e.target.value as Language)}
+          >
+            <option value="ID">Bahasa Indonesia</option>
+            <option value="EN">English</option>
+          </select>
+
+          <button
+            onClick={async () => {
+            try {
+              setIsGeneratingReport(true)
+              const result = await generateReportMutation({
+                sprintId: sprint.id,
+                reportType: "BAST",
+                language: reportLanguage
+              })
+
+              const link = document.createElement('a')
+              link.href = result.url
+              link.download = result.filename
+              document.body.appendChild(link)
+              link.click()
+              document.body.removeChild(link)
+            } catch (error) {
+              console.error('Failed to generate report:', error)
+            } finally {
+              setIsGeneratingReport(false)
+            }
+          }}
+          disabled={isGeneratingReport}
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          >
+            {isGeneratingReport ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                Generating Report...
+              </>
+            ) : (
+              <>
+                <svg className="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Download BAST
+              </>
+            )}
           </button>
         </div>
       </div>
