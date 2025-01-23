@@ -3,6 +3,10 @@ import { UploadServiceFactory } from '../../services/upload/UploadServiceFactory
 import { nanoid } from 'nanoid'
 import { validateUpload } from '../../services/upload/validation'
 
+// Route Segment Config
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
@@ -48,10 +52,4 @@ export async function POST(request: Request) {
       { status: 500 }
     )
   }
-}
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
 }
