@@ -118,3 +118,15 @@ npm run build
 ```bash
 npm start
 ```
+
+## Default Admin Credentials
+
+After running database seed, you can login with:
+
+- **Email:** admin@managed-it.com
+- **Password:** admin123!
+
+⚠️ **Important Security Notice:**
+1. These are default credentials for initial setup only
+2. Change the password immediately after first login
+3. In production, remove or modify seed data for security
