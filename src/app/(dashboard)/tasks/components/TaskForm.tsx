@@ -10,18 +10,16 @@ import createTask from "../mutations/createTask"
 import getClients from "../../clients/queries/getClients"
 import getUsers from "../../../users/queries/getUsers"
 import { User } from "src/app/users/queries/getUsers"
-import { RichTextEditor } from "@/src/app/components/RichTextEditor"
-import { useFormikContext } from 'formik' // Add this import
+import { RichTextEditor } from "@/src/app/components/CKEditor"
+import { useFormikContext } from "formik" // Add this import
 const TaskDescriptionField = () => {
   const { values, setFieldValue } = useFormikContext<any>()
   return (
     <div className="col-span-full">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Description
-      </label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
       <RichTextEditor
-        initialContent={values.description || ''}
-        onChange={(content) => setFieldValue('description', content)}
+        initialValue={values.description || ""}
+        onChange={(content) => setFieldValue("description", content)}
         placeholder="Enter task description..."
       />
     </div>
@@ -65,7 +63,6 @@ export function TaskForm() {
             <LabeledTextField name="title" label="Title" placeholder="Task title" />
           </div>
 
-
           <TaskDescriptionField />
 
           <div className="col-span-full md:col-span-1">
@@ -107,11 +104,7 @@ export function TaskForm() {
           </div>
 
           <div className="col-span-full md:col-span-1">
-            <LabeledTextField
-              name="deadline"
-              label="Deadline"
-              type="datetime-local"
-            />
+            <LabeledTextField name="deadline" label="Deadline" type="datetime-local" />
           </div>
 
           <div className="col-span-full md:col-span-2">

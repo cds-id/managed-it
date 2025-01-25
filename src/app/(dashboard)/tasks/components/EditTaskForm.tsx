@@ -13,7 +13,7 @@ import getUsers from "../../../users/queries/getUsers"
 import { Task } from "@prisma/client"
 import { useState } from "react"
 import { User } from "src/app/users/queries/getUsers"
-import { RichTextEditor } from "@/src/app/components/RichTextEditor"
+import { RichTextEditor } from "@/src/app/components/CKEditor"
 import { useFormikContext } from "formik"
 import { TaskForEdit, TaskAssignee } from "../types"
 
@@ -26,12 +26,10 @@ const TaskDescriptionField = () => {
   const { values, setFieldValue } = useFormikContext<any>()
   return (
     <div className="col-span-full">
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        Description
-      </label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
       <RichTextEditor
-        initialContent={values.description || ''}
-        onChange={(content) => setFieldValue('description', content)}
+        initialValue={values.description || ""}
+        onChange={(content) => setFieldValue("description", content)}
         placeholder="Enter task description..."
       />
     </div>
@@ -61,9 +59,7 @@ export function EditTaskForm({ task }: EditTaskFormProps) {
           priority: task.priority,
           status: task.status,
           clientId: task.clientId,
-          deadline: task.deadline
-            ? new Date(task.deadline).toISOString().slice(0, 16)
-            : "",
+          deadline: task.deadline ? new Date(task.deadline).toISOString().slice(0, 16) : "",
           assigneeIds: task.assignees.map((user) => user.id),
         }}
         onSubmit={async (values) => {
@@ -81,7 +77,6 @@ export function EditTaskForm({ task }: EditTaskFormProps) {
             <div className="col-span-full md:col-span-2">
               <LabeledTextField name="title" label="Title" placeholder="Task title" />
             </div>
-
 
             <TaskDescriptionField />
 
@@ -121,11 +116,7 @@ export function EditTaskForm({ task }: EditTaskFormProps) {
             </div>
 
             <div className="col-span-full md:col-span-1">
-              <LabeledTextField
-                name="deadline"
-                label="Deadline"
-                type="datetime-local"
-              />
+              <LabeledTextField name="deadline" label="Deadline" type="datetime-local" />
             </div>
 
             <div className="col-span-full md:col-span-2">
@@ -159,17 +150,13 @@ export function EditTaskForm({ task }: EditTaskFormProps) {
               <div className="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                    <h3 className="text-base font-semibold leading-6 text-gray-900">
-                      Delete Task
-                    </h3>
+                    <h3 className="text-base font-semibold leading-6 text-gray-900">Delete Task</h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
                         Are you sure you want to delete this task? This action cannot be undone.
                       </p>
                     </div>
-                    {deleteError && (
-                      <p className="mt-2 text-sm text-red-600">{deleteError}</p>
-                    )}
+                    {deleteError && <p className="mt-2 text-sm text-red-600">{deleteError}</p>}
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">

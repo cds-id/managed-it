@@ -82,3 +82,26 @@ a {
 .ProseMirror a {
   @apply text-blue-600 hover:text-blue-800 underline;
 }
+
+
+/* CKEditor container styles */
+.ck-editor__editable {
+  min-height: 200px;
+  max-height: 400px;
+}
+
+.ck.ck-editor__editable > .ck-placeholder::before {
+  color: #6b7280;
+}
+
+.ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused {
+  border-color: #6366f1 !important;
+}
+
+.ck.ck-toolbar {
+  border-color: #e5e7eb !important;
+}
+
+.ck.ck-toolbar .ck-toolbar__items {
+  flex-wrap: wrap;
+}
