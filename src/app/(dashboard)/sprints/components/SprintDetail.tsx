@@ -83,8 +83,8 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
                 })
 
                 const link = document.createElement("a")
-                link.href = result.url
-                ;(link.download = `/api/reports/${result.filename}`), "_blank"
+                link.href = `/api/${result.url}`
+                link.download = result.filename
                 document.body.appendChild(link)
                 link.click()
                 document.body.removeChild(link)
