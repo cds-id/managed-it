@@ -211,9 +211,7 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
                       dangerouslySetInnerHTML={
                         task.description ? { __html: task.description } : undefined
                       }
-                    >
-                      {!task.description && "No description provided"}
-                    </div>
+                    />
                   </div>
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(

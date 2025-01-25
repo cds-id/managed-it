@@ -105,3 +105,44 @@ a {
 .ck.ck-toolbar .ck-toolbar__items {
   flex-wrap: wrap;
 }
+
+
+.ck.ck-editor {
+  @apply w-full;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+  @apply min-h-[200px] max-h-[600px] prose prose-sm sm:prose lg:prose-lg xl:prose-xl;
+}
+
+.ck.ck-editor__main > .ck-editor__editable.ck-focused {
+  @apply border-indigo-500;
+}
+
+.ck.ck-editor__main > .ck-editor__editable img {
+  @apply max-w-full h-auto;
+}
+
+.ck-content .image {
+  @apply max-w-full mx-auto;
+}
+
+.ck-content .image img {
+  @apply rounded-lg;
+}
+
+.ck-content .image-style-side {
+  @apply max-w-[50%] float-right ml-4;
+}
+
+.ck-content .image-style-align-left {
+  @apply float-left mr-4;
+}
+
+.ck-content .image-style-align-right {
+  @apply float-right ml-4;
+}
+
+.ck-content .image-style-align-center {
+  @apply mx-auto;
+}
