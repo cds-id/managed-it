@@ -1,3 +1,25 @@
+# [2.0.0](https://github.com/cds-id/managed-it/compare/v1.2.0...v2.0.0) (2025-01-25)
+
+### Bug Fixes
+
+- add all ([9509c39](https://github.com/cds-id/managed-it/commit/9509c39d23d4bb13349e9d1f862aec5dc656df34))
+- database and other essential methods ([e9c8a68](https://github.com/cds-id/managed-it/commit/e9c8a68d79e31df0cc4c9e3d632d3560d8190f26))
+- description is html ([1848ca5](https://github.com/cds-id/managed-it/commit/1848ca5aef15521d7e0a389c9b74eb89bb29f081))
+- endpoint upload force ([e9af011](https://github.com/cds-id/managed-it/commit/e9af0113fd88e8684d4cc9735a418f1fb23bb4c9))
+- fix build docker ([0855ca6](https://github.com/cds-id/managed-it/commit/0855ca6eb6cdbd05fe2c68402a4613d361a0e2ed))
+- issue path ([a5cb89c](https://github.com/cds-id/managed-it/commit/a5cb89c4558c65cf79a62e47bcad8e5e749b71d6))
+- list task fix pagination should show 1 instead of 0 ([3a6d146](https://github.com/cds-id/managed-it/commit/3a6d1468996b9fbac0502626280d3c7c0377de9a))
+- remove hashed password ([71823e4](https://github.com/cds-id/managed-it/commit/71823e4ddfc9c5b8ebf8d33d0aacbda9b47985d0))
+- seeds ([c231724](https://github.com/cds-id/managed-it/commit/c2317244f889b3a2940c52b5932a26b248c8eb55))
+- some errors ([b104e99](https://github.com/cds-id/managed-it/commit/b104e99732b3580feae0997c7df3643935f506c5))
+- sprint download fix ([3f4ec44](https://github.com/cds-id/managed-it/commit/3f4ec44b70971aef60131dc1b93edadda4aaaf97))
+- sprint list is html ([91d61bd](https://github.com/cds-id/managed-it/commit/91d61bd60dd6e162c64397ec4e689bf7e0c7c157))
+
+### Features
+
+- create new reports ([3f82ee1](https://github.com/cds-id/managed-it/commit/3f82ee18eb1a8d1b06cc400fe396123a6d1fb134))
+- mail notification ([3b51ec1](https://github.com/cds-id/managed-it/commit/3b51ec17b23457c752a6e0da95ddcf173ee35e0e))
+
 # [1.2.0](https://github.com/cds-id/managed-it/compare/v1.1.0...v1.2.0) (2025-01-23)
 
 ### Bug Fixes
