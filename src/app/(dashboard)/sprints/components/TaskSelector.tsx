@@ -48,8 +48,14 @@ export function TaskSelector({ clientId }: TaskSelectorProps) {
           >
             <div className="flex items-start space-x-3">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">{task.title}</p>
-                <p className="text-sm text-gray-500 truncate">{task.description}</p>
+                <p
+                  className="text-sm font-medium text-gray-900"
+                  dangerouslySetInnerHTML={{ __html: task.title }}
+                ></p>
+                <p
+                  className="text-sm text-gray-500 truncate"
+                  dangerouslySetInnerHTML={{ __html: task?.description ?? "" }}
+                ></p>
               </div>
               <div className="flex-shrink-0">
                 <span
