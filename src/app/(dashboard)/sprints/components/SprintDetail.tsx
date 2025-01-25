@@ -206,7 +206,14 @@ export function SprintDetail({ sprint }: SprintDetailProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h5 className="text-sm font-medium text-gray-900">{task.title}</h5>
-                    <p className="mt-1 text-sm text-gray-500">{task.description}</p>
+                    <div
+                      className="mt-1 text-sm text-gray-500"
+                      dangerouslySetInnerHTML={
+                        task.description ? { __html: task.description } : undefined
+                      }
+                    >
+                      {!task.description && "No description provided"}
+                    </div>
                   </div>
                   <span
                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
