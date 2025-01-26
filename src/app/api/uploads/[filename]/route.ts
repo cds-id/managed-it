@@ -2,14 +2,35 @@ import { NextRequest, NextResponse } from "next/server"
 import { join } from "path"
 import { stat, readFile } from "fs/promises"
 import { getBlitzContext } from "@/src/app/blitz-server"
+import { validateApiToken } from "@/src/lib/auth"
 
 const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp"]
 
 export async function GET(request: NextRequest, { params }: { params: { filename: string } }) {
   try {
-    // Check authentication
-    const ctx = await getBlitzContext()
-    if (!ctx.session.userId) {
+    // Check authentication - either session or API token
+    let isAuthenticated = false
+
+    // First check for API token
+    const authHeader = request.headers.get("Authorization")
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "")
+      const userId = await validateApiToken(token)
+      if (userId) {
+        isAuthenticated = true
+      }
+    }
+
+    // If no valid API token, check for session authentication
+    if (!isAuthenticated) {
+      const ctx = await getBlitzContext()
+      if (ctx.session.userId) {
+        isAuthenticated = true
+      }
+    }
+
+    // Return unauthorized if neither authentication method is valid
+    if (!isAuthenticated) {
       return new NextResponse("Unauthorized", { status: 401 })
     }
 
