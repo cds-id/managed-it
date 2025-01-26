@@ -1,9 +1,11 @@
 "use client"
-import { Task, User } from "@prisma/client"
 import { formatDate } from "src/app/utils/formatDate"
 import Link from "next/link"
 import { Route } from "next"
 import { TaskWithRelations } from "../types"
+import { TimeTrackerModal } from "../../timetracking/components/TimeTrackerModal"
+import { TimeEntryList } from "../../timetracking/components/TimeEntryList"
+import { useState, useRef } from "react"
 
 interface TaskDetailProps {
   task: TaskWithRelations
@@ -40,131 +42,162 @@ const STATUS_CONFIG = {
 }
 
 export function TaskDetail({ task }: TaskDetailProps) {
+  const [isTimeTrackerOpen, setIsTimeTrackerOpen] = useState(false)
+  const timeEntryListRef = useRef<any>(null)
+
+  const timeTrackingButton = (
+    <button
+      onClick={() => setIsTimeTrackerOpen(true)}
+      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 self-center"
+    >
+      <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      Track Time
+    </button>
+  )
+
+  const handleTimeTrackerClose = () => {
+    setIsTimeTrackerOpen(false)
+    timeEntryListRef.current?.refetch?.()
+  }
+
   return (
-    <div className="bg-white shadow sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-2xl font-bold leading-6 text-gray-900">
-              {task.title}
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Created for {task.client.name}
-            </p>
+    <>
+      <div className="bg-white shadow sm:rounded-lg">
+        <div className="px-4 py-5 sm:px-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-2xl font-bold leading-6 text-gray-900">{task.title}</h3>
+              <p className="mt-1 max-w-2xl text-sm text-gray-500">Created for {task.client.name}</p>
+            </div>
+            <div className="flex space-x-4 items-center">
+              {timeTrackingButton}
+              <Link
+                href={`/tasks/${task.id}` as Route}
+                className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+              >
+                Edit Task
+              </Link>
+            </div>
           </div>
-          <Link
-            href={`/tasks/${task.id}` as Route}
-            className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
-          >
-            Edit Task
-          </Link>
         </div>
-      </div>
-      <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-        <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <dt className="text-sm font-medium text-gray-500">Description</dt>
-            <dd className="mt-1 text-sm text-gray-900 prose max-w-none"
+        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500">Description</dt>
+              <dd
+                className="mt-1 text-sm text-gray-900 prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: task.description || "No description provided" }}
-            />
-          </div>
+              />
+            </div>
 
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Status</dt>
-            <dd className="mt-1 text-sm text-gray-900">
-              <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  STATUS_CONFIG[task.status].className
-                }`}
-              >
-                {STATUS_CONFIG[task.status].label}
-              </span>
-            </dd>
-          </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Status</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    STATUS_CONFIG[task.status].className
+                  }`}
+                >
+                  {STATUS_CONFIG[task.status].label}
+                </span>
+              </dd>
+            </div>
 
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Priority</dt>
-            <dd className="mt-1 text-sm text-gray-900">
-              <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  PRIORITY_CONFIG[task.priority].className
-                }`}
-              >
-                {PRIORITY_CONFIG[task.priority].label}
-              </span>
-            </dd>
-          </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Priority</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    PRIORITY_CONFIG[task.priority].className
+                  }`}
+                >
+                  {PRIORITY_CONFIG[task.priority].label}
+                </span>
+              </dd>
+            </div>
 
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Created At</dt>
-            <dd className="mt-1 text-sm text-gray-900">
-              {formatDate(task.createdAt)}
-            </dd>
-          </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Created At</dt>
+              <dd className="mt-1 text-sm text-gray-900">{formatDate(task.createdAt)}</dd>
+            </div>
 
-          <div className="sm:col-span-1">
-            <dt className="text-sm font-medium text-gray-500">Deadline</dt>
-            <dd className="mt-1 text-sm text-gray-900">
-              {task.deadline ? formatDate(task.deadline) : "No deadline set"}
-            </dd>
-          </div>
+            <div className="sm:col-span-1">
+              <dt className="text-sm font-medium text-gray-500">Deadline</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                {task.deadline ? formatDate(task.deadline) : "No deadline set"}
+              </dd>
+            </div>
 
-          <div className="sm:col-span-2">
-            <dt className="text-sm font-medium text-gray-500">Assigned To</dt>
-            <dd className="mt-1 text-sm text-gray-900">
-              {task.assignees.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {task.assignees.map((assignee) => (
-                    <span
-                      key={assignee.id}
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
-                    >
-                      {assignee.name || assignee.email}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                "No assignees"
-              )}
-            </dd>
-          </div>
+            <div className="sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500">Assigned To</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                {task.assignees.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {task.assignees.map((assignee) => (
+                      <span
+                        key={assignee.id}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800"
+                      >
+                        {assignee.name || assignee.email}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  "No assignees"
+                )}
+              </dd>
+            </div>
 
-          <div className="sm:col-span-2">
-            <dt className="text-sm font-medium text-gray-500">Activity</dt>
-            <dd className="mt-1 text-sm text-gray-900">
-              <div className="flow-root">
-                <ul role="list" className="-mb-8">
-                  <li>
-                    <div className="relative pb-8">
-                      <div className="relative flex space-x-3">
-                        <div>
-                          <span className="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white">
-                            <span className="text-white text-sm">
-                              {task.client.name[0].toUpperCase()}
-                            </span>
-                          </span>
-                        </div>
-                        <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+            <div className="sm:col-span-2">
+              <dt className="text-sm font-medium text-gray-500">Activity</dt>
+              <dd className="mt-1 text-sm text-gray-900">
+                <div className="flow-root">
+                  <ul role="list" className="-mb-8">
+                    <li>
+                      <div className="relative pb-8">
+                        <div className="relative flex space-x-3">
                           <div>
-                            <p className="text-sm text-gray-500">
-                              Created by <span className="font-medium text-gray-900">System</span>
-                            </p>
+                            <span className="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white">
+                              <span className="text-white text-sm">
+                                {task.client.name[0].toUpperCase()}
+                              </span>
+                            </span>
                           </div>
-                          <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                            <time dateTime={task.createdAt.toISOString()}>
-                              {formatDate(task.createdAt)}
-                            </time>
+                          <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                Created by <span className="font-medium text-gray-900">System</span>
+                              </p>
+                            </div>
+                            <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                              <time dateTime={task.createdAt.toISOString()}>
+                                {formatDate(task.createdAt)}
+                              </time>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-            </dd>
-          </div>
-        </dl>
+                    </li>
+                  </ul>
+                </div>
+              </dd>
+            </div>
+          </dl>
+        </div>
       </div>
-    </div>
+
+      <TimeTrackerModal task={task} isOpen={isTimeTrackerOpen} onClose={handleTimeTrackerClose} />
+
+      <div className="mt-8">
+        <TimeEntryList ref={timeEntryListRef} taskId={task.id} />
+      </div>
+    </>
   )
 }

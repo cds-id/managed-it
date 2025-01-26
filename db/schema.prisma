@@ -17,6 +17,11 @@ enum UserRole {
   WORKER
 }
 
+enum ApiTokenType {
+  PERSONAL
+  INTEGRATION
+}
+
 enum Priority {
   LOW
   MEDIUM
@@ -41,9 +46,10 @@ model User {
   tokens        Token[]
   sessions      Session[]
   assignedTasks Task[]     @relation("TaskAssignees")
-  comments      Comment[]  @relation("UserComments") // Add relation name
+  comments      Comment[]  @relation("UserComments")
+  timeEntries   TimeEntry[] @relation("UserTimeEntries")
+  apiTokens     ApiToken[]
 }
-
 
 model Session {
   id                 String    @id @default(uuid())
@@ -75,13 +81,28 @@ model Token {
   @@unique([hashedToken, type])
 }
 
+model ApiToken {
+  id          String      @id @default(uuid())
+  token       String      @unique
+  name        String
+  type        ApiTokenType @default(PERSONAL)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  lastUsedAt  DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  expiresAt   DateTime?
+
+  @@index([userId])
+}
+
 model Client {
   id          String   @id @default(uuid())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   name        String
   contactInfo String
-  notes       String?  @db.Text  // Keep it as notes to match the UI
+  notes       String?  @db.Text
 
   tasks   Task[]
   sprints Sprint[]
@@ -104,7 +125,7 @@ model Comment {
 model Task {
   id          String     @id @default(cuid())
   title       String
-  description String?
+  description String? @db.Text
   status      TaskStatus
   priority    Priority
   createdAt   DateTime   @default(now())
@@ -113,10 +134,39 @@ model Task {
   clientId    String
   client      Client     @relation(fields: [clientId], references: [id])
   assignees   User[]     @relation("TaskAssignees")
-  comments    Comment[]  @relation("TaskComments") // Add relation name
+  comments    Comment[]  @relation("TaskComments")
   sprintTasks SprintTask[]
+  timeEntries TimeEntry[]
 
   @@index([clientId])
+}
+
+model TimeEntry {
+  id          String       @id @default(uuid())
+  task        Task         @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      String
+  user        User         @relation("UserTimeEntries", fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int          // Duration in minutes
+  description String?      @db.Text
+  screenshots Screenshot[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model Screenshot {
+  id          String     @id @default(uuid())
+  timeEntry   TimeEntry  @relation(fields: [timeEntryId], references: [id], onDelete: Cascade)
+  timeEntryId String
+  imageUrl    String     @db.Text
+  createdAt   DateTime   @default(now())
+
+  @@index([timeEntryId])
 }
 
 model Sprint {

@@ -55,6 +55,14 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
                     Users
                   </Link>
                 )}
+                {isAdmin && (
+                  <Link
+                    href="/settings/api-tokens"
+                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  >
+                    API Tokens
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -68,7 +76,12 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
                 <span className="sr-only">Open main menu</span>
                 {/* Hamburger Icon */}
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               </button>
             </div>
@@ -116,9 +129,7 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        {children}
-      </main>
+      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{children}</main>
     </div>
   )
 }
